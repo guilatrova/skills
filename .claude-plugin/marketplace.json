@@ -15,6 +15,11 @@
       "name": "concise-replies",
       "source": "./plugins/concise-replies",
       "description": "Short, plain-language answers that respond to the literal question"
+    },
+    {
+      "name": "cache-keeper",
+      "source": "./plugins/cache-keeper",
+      "description": "Opt-in prompt cache keep-alive (a mod): refreshes the cache before it expires and writes a handoff"
     }
   ]
 }

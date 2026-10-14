@@ -8,6 +8,7 @@ Each skill is a plain `SKILL.md` folder, so it also works in Codex and any agent
 | --- | --- |
 | [code-quality](#code-quality) | Makes the agent plan and review changes against a concrete quality bar, with a read-only reviewer subagent |
 | [concise-replies](#concise-replies) | Makes the agent answer questions briefly, in plain language, starting with the literal answer |
+| [cache-keeper](#cache-keeper) | A Claude Code mod that keeps the prompt cache warm while you are away and writes a handoff before it gives up |
 
 ## Install
 
@@ -19,6 +20,7 @@ Add the marketplace once, then install the plugins you want:
 claude plugin marketplace add guilatrova/skills
 claude plugin install code-quality@guilatrova-skills
 claude plugin install concise-replies@guilatrova-skills
+claude plugin install cache-keeper@guilatrova-skills
 ```
 
 Inside a session, `/plugin marketplace add guilatrova/skills` and `/plugin` do the same.
@@ -35,6 +37,7 @@ Plugin skills and agents are namespaced by the plugin name:
 | code-quality skill | `/code-quality:code-quality` |
 | reviewer subagent | `code-quality:quality-reviewer` (or `@agent-code-quality:quality-reviewer`) |
 | concise-replies skill | `/concise-replies:concise-replies` |
+| cache-keeper command | `/keepalive on`, `/keepalive off`, `/keepalive status` |
 
 You rarely type these: Claude picks the skill from its description when the task matches.
 
@@ -163,6 +166,34 @@ Before: a page on the preference parser, the storage layer and three possible ne
 After: "Yes. Simple preferences such as 'prefer YouTube' already work. Arbitrary conditions such
 as 'use AI whenever the scene is conceptual' are not implemented."
 
+## cache-keeper
+
+**Why it exists.** Claude Code caches the conversation prefix for an hour. Step away longer and
+the next prompt pays to re-read the whole context, and on a long session that is slow and eats
+usage. This mod keeps the cache warm for a bounded time, and before it stops it saves a handoff,
+so you can resume in a fresh session instead of paying for the old one.
+
+It is a [mod](https://code.claude.com/docs/en/plugins/mods/overview): it runs inside Claude Code
+(not Codex), with no tokens spent until it fires.
+
+**How it works.**
+
+- Off by default. Turn it on per session with `/keepalive on`; `/keepalive status` shows the
+  state and the last handoff.
+- After each turn it schedules a refresh 50 minutes later (10 minutes before the cache expires).
+  Any new prompt cancels it, because your own activity already refreshes the cache.
+- At most 2 refreshes per idle stretch. The first one sends a tiny "ok" request. The last one
+  asks the model for a short handoff (goal, done so far, current state, next steps, gotchas) and
+  saves it to `/tmp/claude-handoffs/<project>-<session>.md`.
+- It skips sessions under 30k tokens of context, where re-caching is cheap anyway.
+- When the context reaches 90%, it writes a handoff once, so you have one before compaction.
+- The status line shows `keep-alive 1/2 · handoff: <path>` while it is on.
+
+**Assumptions.** The 1-hour TTL is what a Claude subscription gets within plan usage; on the API
+or in overage the cache lasts 5 minutes, and the mod does not help there. Mods need Claude Code
+v2.1.287 or later; it was built and tested on v2.1.300. Run its tests with `claude plugin test`
+from `plugins/cache-keeper`.
+
 ## Repository layout
 
 ```text
@@ -175,6 +206,9 @@ plugins/
   concise-replies/
     .claude-plugin/plugin.json
     skills/concise-replies/SKILL.md
+  cache-keeper/                     # Claude Code mod
+    .claude-plugin/plugin.json
+    hooks/hooks.json, register.ts, keepalive.test.ts
 codex/agents/quality_reviewer.toml  # Codex reviewer subagent
 ```
 

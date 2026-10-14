@@ -1,0 +1,11 @@
+{
+  "name": "cache-keeper",
+  "version": "0.1.0",
+  "description": "Opt-in prompt cache keep-alive: writes a handoff and refreshes the cache before it expires (max 2 per idle stretch)",
+  "author": {
+    "name": "Guilherme Latrova",
+    "url": "https://github.com/guilatrova"
+  },
+  "repository": "https://github.com/guilatrova/skills",
+  "license": "MIT"
+}
