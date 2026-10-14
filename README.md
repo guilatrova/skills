@@ -1,4 +1,4 @@
-# agent-skills
+# skills
 
 Skills I use every day with Claude Code and Codex, published as a Claude Code plugin marketplace.
 Each skill is a plain `SKILL.md` folder, so it also works in Codex and any agent that reads the
@@ -16,12 +16,12 @@ Each skill is a plain `SKILL.md` folder, so it also works in Codex and any agent
 Add the marketplace once, then install the plugins you want:
 
 ```bash
-claude plugin marketplace add guilatrova/agent-skills
+claude plugin marketplace add guilatrova/skills
 claude plugin install code-quality@guilatrova-skills
 claude plugin install concise-replies@guilatrova-skills
 ```
 
-Inside a session, `/plugin marketplace add guilatrova/agent-skills` and `/plugin` do the same.
+Inside a session, `/plugin marketplace add guilatrova/skills` and `/plugin` do the same.
 Start a new session (or run `/reload-plugins`) to load them. To get updates later:
 
 ```bash
@@ -44,7 +44,7 @@ You rarely type these: Claude picks the skill from its description when the task
 into Claude Code, Codex and other agents:
 
 ```bash
-npx skills add guilatrova/agent-skills -g
+npx skills add guilatrova/skills -g
 ```
 
 ### Codex (or any agent that reads `~/.agents/skills`)
@@ -52,11 +52,11 @@ npx skills add guilatrova/agent-skills -g
 Clone the repo and link the skills into your skills folder, so `git pull` keeps them current:
 
 ```bash
-git clone https://github.com/guilatrova/agent-skills.git ~/agent-skills
+git clone https://github.com/guilatrova/skills.git ~/skills
 mkdir -p ~/.agents/skills ~/.codex/agents
-ln -s ~/agent-skills/plugins/code-quality/skills/code-quality ~/.agents/skills/code-quality
-ln -s ~/agent-skills/plugins/concise-replies/skills/concise-replies ~/.agents/skills/concise-replies
-ln -s ~/agent-skills/codex/agents/quality_reviewer.toml ~/.codex/agents/quality_reviewer.toml
+ln -s ~/skills/plugins/code-quality/skills/code-quality ~/.agents/skills/code-quality
+ln -s ~/skills/plugins/concise-replies/skills/concise-replies ~/.agents/skills/concise-replies
+ln -s ~/skills/codex/agents/quality_reviewer.toml ~/.codex/agents/quality_reviewer.toml
 ```
 
 The Codex reviewer reads the skill from `~/.agents/skills/code-quality/SKILL.md`, so keep that
