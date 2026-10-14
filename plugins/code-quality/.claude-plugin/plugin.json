@@ -1,0 +1,11 @@
+{
+  "name": "code-quality",
+  "version": "1.0.0",
+  "description": "A code-quality bar for planning and reviewing changes, plus a read-only reviewer subagent",
+  "author": {
+    "name": "Guilherme Latrova",
+    "url": "https://github.com/guilatrova"
+  },
+  "repository": "https://github.com/guilatrova/agent-skills",
+  "license": "MIT"
+}

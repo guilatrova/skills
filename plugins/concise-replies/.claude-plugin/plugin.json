@@ -1,0 +1,11 @@
+{
+  "name": "concise-replies",
+  "version": "1.0.0",
+  "description": "Short, plain-language answers that respond to the literal question",
+  "author": {
+    "name": "Guilherme Latrova",
+    "url": "https://github.com/guilatrova"
+  },
+  "repository": "https://github.com/guilatrova/agent-skills",
+  "license": "MIT"
+}
