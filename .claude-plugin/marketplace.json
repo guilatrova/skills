@@ -17,6 +17,11 @@
       "description": "Short, plain-language answers that respond to the literal question"
     },
     {
+      "name": "design-interview",
+      "source": "./plugins/design-interview",
+      "description": "Finds what a screen should look like by comparing rendered mockups, one question at a time, then writes the design direction"
+    },
+    {
       "name": "cache-keeper",
       "source": "./plugins/cache-keeper",
       "description": "Opt-in prompt cache keep-alive (a mod): refreshes the cache before it expires and writes a handoff"

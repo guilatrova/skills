@@ -1,0 +1,11 @@
+{
+  "name": "design-interview",
+  "version": "1.0.0",
+  "description": "Finds what a screen should look like by comparing rendered mockups, one question at a time, then writes the design direction",
+  "author": {
+    "name": "Guilherme Latrova",
+    "url": "https://github.com/guilatrova"
+  },
+  "repository": "https://github.com/guilatrova/skills",
+  "license": "MIT"
+}

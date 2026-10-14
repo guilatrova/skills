@@ -8,6 +8,7 @@ Each skill is a plain `SKILL.md` folder, so it also works in Codex and any agent
 | --- | --- |
 | [code-quality](#code-quality) | Makes the agent plan and review changes against a concrete quality bar, with a read-only reviewer subagent |
 | [concise-replies](#concise-replies) | Makes the agent answer questions briefly, in plain language, starting with the literal answer |
+| [design-interview](#design-interview) | Finds what a screen should look like by comparing rendered mockups, one question at a time |
 | [cache-keeper](#cache-keeper) | A Claude Code mod that keeps the prompt cache warm while you are away and writes a handoff before it gives up |
 
 ## Install
@@ -20,6 +21,7 @@ Add the marketplace once, then install the plugins you want:
 claude plugin marketplace add guilatrova/skills
 claude plugin install code-quality@guilatrova-skills
 claude plugin install concise-replies@guilatrova-skills
+claude plugin install design-interview@guilatrova-skills
 claude plugin install cache-keeper@guilatrova-skills
 ```
 
@@ -37,6 +39,7 @@ Plugin skills and agents are namespaced by the plugin name:
 | code-quality skill | `/code-quality:code-quality` |
 | reviewer subagent | `code-quality:quality-reviewer` (or `@agent-code-quality:quality-reviewer`) |
 | concise-replies skill | `/concise-replies:concise-replies` |
+| design-interview skill | `/design-interview:design-interview` |
 | cache-keeper command | `/keepalive on`, `/keepalive off`, `/keepalive status` |
 
 You rarely type these: Claude picks the skill from its description when the task matches.
@@ -59,6 +62,7 @@ git clone https://github.com/guilatrova/skills.git ~/skills
 mkdir -p ~/.agents/skills ~/.codex/agents
 ln -s ~/skills/plugins/code-quality/skills/code-quality ~/.agents/skills/code-quality
 ln -s ~/skills/plugins/concise-replies/skills/concise-replies ~/.agents/skills/concise-replies
+ln -s ~/skills/plugins/design-interview/skills/design-interview ~/.agents/skills/design-interview
 ln -s ~/skills/codex/agents/quality_reviewer.toml ~/.codex/agents/quality_reviewer.toml
 ```
 
@@ -166,6 +170,33 @@ Before: a page on the preference parser, the storage layer and three possible ne
 After: "Yes. Simple preferences such as 'prefer YouTube' already work. Arbitrary conditions such
 as 'use AI whenever the scene is conceptual' are not implemented."
 
+## design-interview
+
+**Why it exists.** You look at a screen and know it is wrong ("looks like a web app", "too
+static", "ugly") but not what would be right. Asking an agent to "make it prettier" gets a
+random redesign. This skill finds your taste by comparison instead: same screen, same content,
+2 to 4 rendered options that differ in one thing, and you pick.
+
+**How it works.**
+
+1. **Ground.** Reads the product docs and earlier design records, looks at the current screens,
+   and researches any reference app you mention (what it does vs how it looks).
+2. **Interview, one question per message.** From broad to narrow: references, visual direction,
+   dark or light, motion, navigation, the hardest flow, typography, components, personality.
+   Each question comes with mockups rendered to PNG, or a clickable HTML prototype when motion
+   or interaction is the question.
+3. **Record.** Every answer goes to `design/design-interview.md` right away, with the options
+   shown and what you rejected.
+4. **Synthesize.** Writes `design/design-direction.md` (principles, tokens with hex values,
+   type, motion, navigation) and `design/screens.md` (screen inventory and a build plan).
+   Changes that alter product behavior, not just design, come back to you as a question.
+5. **Build or delegate.** Builds the shared foundation first (tokens, core components), then
+   the screens, and compares screenshots against the approved mockups before showing you.
+
+It ships two Playwright scripts: `render.mjs` (HTML mockup to PNG) and `shot.mjs` (phone-size
+screenshots of a running preview). They need `playwright-core` and Chromium; the skill explains
+the one-line setup. Mockups are copied to `~/Desktop` and opened, so it assumes a desktop OS.
+
 ## cache-keeper
 
 **Why it exists.** Claude Code caches the conversation prefix for an hour. Step away longer and
@@ -206,6 +237,9 @@ plugins/
   concise-replies/
     .claude-plugin/plugin.json
     skills/concise-replies/SKILL.md
+  design-interview/
+    .claude-plugin/plugin.json
+    skills/design-interview/        # SKILL.md + scripts/
   cache-keeper/                     # Claude Code mod
     .claude-plugin/plugin.json
     hooks/hooks.json, register.ts, keepalive.test.ts
