@@ -38,6 +38,15 @@ Plugin skills and agents are namespaced by the plugin name:
 
 You rarely type these: Claude picks the skill from its description when the task matches.
 
+### Any agent, with the skills CLI
+
+[skills](https://github.com/vercel-labs/skills) installs the skills (not the reviewer subagent)
+into Claude Code, Codex and other agents:
+
+```bash
+npx skills add guilatrova/agent-skills -g
+```
+
 ### Codex (or any agent that reads `~/.agents/skills`)
 
 Clone the repo and link the skills into your skills folder, so `git pull` keeps them current:
