@@ -1,6 +1,6 @@
 {
   "name": "design-interview",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Finds what a screen should look like by comparing rendered mockups, one question at a time, then writes the design direction",
   "author": {
     "name": "Guilherme Latrova",

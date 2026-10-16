@@ -26,17 +26,22 @@ Confirm in one or two sentences what you understood (taste discovery, one questi
 
 ### 2. Interview — one question per message
 - Start broad, then narrow: references they love and why → mechanics to borrow → overall visual direction → dark/light → motion level → navigation model → the hardest flow (e.g. builder/editor) → typography → component treatments (emphasis, grouping) → data visualization → personality (illustration vs typography) → "anything else that bothers you?".
-- **Prefer comparison over open questions.** Offer 2–4 concrete options, each rendered as a mockup of the *same* screen and content so only the dimension under test changes. Name options with a letter and a short evocative label ("A · Noite", "B · Calma").
+- **Prefer comparison over open questions.** Offer 2–4 concrete options, each built as an interactive prototype of the *same* screen and content (see §3) so only the dimension under test changes. Name options with a letter and a short evocative label ("A · Night", "B · Calm").
 - Use `AskUserQuestion` (multi-select when choices are not exclusive) for quick choices; plain text for "which mockup + what would you change".
 - When the user can't imagine something, **expand that option** (more frames: empty state, multi-item case, interaction states) before asking again. Do not record an answer they did not give.
 - If something distracts them from judging (e.g. the font), resolve that first.
 - Keep each message short: what the mockup shows, the question. No essays.
 
 ### 3. Mockups and prototypes
-- Static mockups: write self-contained HTML (Google Fonts allowed) with phone frames of ~360–412×800 px, render to PNG with `scripts/render.mjs`, look at the result yourself (fix overlaps, cut-offs, typos), then copy to `~/Desktop/<descriptive-name>.png` and `open` it.
-- Motion/interaction: build a clickable single-file HTML prototype (state in JS, CSS transitions) with toggles for the dimension under test (e.g. motion "Vivo/Sutil", theme), smoke-test it with Playwright, then `open` it in the browser. Respect product rules in prototypes too (e.g. step sizes) — the user will catch mistakes.
+- **Every mockup is a working, interactive prototype of the page, never a static picture.** The user must be able to *use* it to feel how the page will be: navigate between sections, click items, open details, hover, type in fields, copy, play/scrub — whatever the real page will do. A static frame (or a PNG) of a page is not a mockup; the user wants an interactive HTML mockup to get a better feel for the final page.
+- **One page holds all options.** Build the options as alternative layouts of the same working app, over the same state and data, with a small floating switcher (e.g. bottom center pill "A · Gallery / B · Studio / C · Paper") so the user flips between them mid-task and only the dimension under test changes. Add toggles for secondary dimensions (motion "Lively/Subtle", theme).
+- **Use the real thing whenever it exists.** If the product already has components, data or a library (UI components, canvas pieces, real records), load and render those live in the prototype instead of drawing look-alikes. When browser security blocks that from `file://` (ES modules, `fetch`), serve the prototype with a tiny local server bound to `127.0.0.1` that maps the prototype folder plus the repo paths it needs (the worktree you are in, never another checkout), and run it in the background.
+- Keep it a single HTML file (inline CSS and JS, Google Fonts allowed; phone frames of ~360–412×800 px for mobile, full window for desktop tools). Realistic interaction states: hover, selection, empty and error states, toasts for copy.
+- Look at it yourself first: smoke-test every option with Playwright (click through, collect console/page errors, count items that fail to render) and screenshot each option to check overlaps, cut-offs and typos (`scripts/render.mjs` for files, a Playwright screenshot for a served page). Screenshots are only for your own check.
+- Then open it in a tab for the user: inside Orca, in Orca's built-in browser (`orca tab create --url <file:// or http://127.0.0.1 URL> --json`, see the `orca-cli` skill); outside Orca, `open` it in the default browser. Reuse the same tab (`orca goto --page <id>`) for later rounds. Tell the user in two or three lines what they can do in it and its known limits.
+- Respect product rules in prototypes too (e.g. step sizes) — the user will catch mistakes.
 - Use realistic domain data and the product language, never lorem ipsum.
-- Store the HTML sources and approved PNGs in the repo (`design/mockups/`) once a direction is chosen so implementers can match them.
+- **Mockups are temporary and never committed.** Keep them outside the repository (the session scratchpad, or a temp folder), not in `design/` and not in the PR. They exist only for the user to analyze and decide; the decisions live in `design/design-interview.md` and `design/design-direction.md`, written precisely enough (tokens, sizes, layout) that implementers do not need the mockup files.
 
 ### 4. Record everything as you go
 Maintain `design/design-interview.md` (English): context, guiding mindset, then one section per question with the options shown, the user's answer (quote short phrases), rejections, and what it implies. Append immediately after each answer — never batch.
@@ -49,7 +54,7 @@ Maintain `design/design-interview.md` (English): context, guiding mindset, then 
 ### 6. Build or delegate
 - Build the shared foundation yourself first (tokens, typography, core components, navigation skeleton, demo data for previews) and commit it — parallel workers need a committed base.
 - Delegate screens in parallel only with: a shared brief (rules, read-order, read-only shared files, preview ports, screenshot tool, checks, commit + report format), disjoint file ownership per worker, and contracts for cross-screen pieces (routes, pickers, current-selection helpers).
-- Integrate: merge, close the foundation gaps workers report, run typecheck/lint/tests, screenshot every screen (dark and light) and compare against the approved mockups before showing the user.
+- Integrate: merge, close the foundation gaps workers report, run typecheck/lint/tests, screenshot every screen (dark and light) and compare against the design direction (and the approved mockups, if they are still in the scratchpad) before showing the user.
 
 ## Scripts
 
@@ -61,6 +66,7 @@ Both need `playwright-core` and a Chromium build. If missing: `cd <scratch dir> 
 ## Anti-patterns
 - Asking several questions at once, or asking the user to describe a design in words.
 - Showing mockups you have not looked at yourself.
+- Showing a static image (or a non-clickable HTML frame) as the mockup, or committing mockups to the repository.
 - Treating a mockup detail the user did not comment on as approved, or a reference app's look as liked when only its mechanics were praised.
 - Inventing metrics, labels or features in mockups that the product never decided — flag them as proposals.
 - Redesigning before the interview ends, or applying the result to one screen only when the user asked for all.
